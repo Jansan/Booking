@@ -32,8 +32,19 @@ namespace Booking.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //services.ConfigureApplicationCookie(opt =>
+            //{
+            //    opt.ExpireTimeSpan = TimeSpan.FromDays(10);
+
+            //});
+            //services.Configure<IdentityOptions>(opt =>
+            //{
+            //    opt.Password.RequireDigit = false;
+            //});
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
