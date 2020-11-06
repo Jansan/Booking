@@ -120,17 +120,20 @@ namespace Booking.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
+           
             if (id == null)
             {
                 return NotFound();
             }
 
-            var gymClass = await db.GymClasses.FindAsync(id);
-            if (gymClass == null)
+            var model =  mapper.Map<EditGymClassViewModel>(await db.GymClasses.FindAsync(id));
+
+
+            if (model == null)
             {
                 return NotFound();
             }
-            return View(gymClass);
+            return View(model);
         }
 
         // POST: GymClasses/Edit/5
@@ -138,15 +141,16 @@ namespace Booking.Web.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartDate,Duration,Description")] GymClass gymClass)
+        public async Task<IActionResult> Edit(int id, EditGymClassViewModel viewModel)
         {
-            if (id != gymClass.Id)
+            if (id != viewModel.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+             var gymClass = mapper.Map<GymClass>(viewModel);
                 try
                 {
                     db.Update(gymClass);
@@ -154,7 +158,7 @@ namespace Booking.Web.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GymClassExists(gymClass.Id))
+                    if (!GymClassExists(viewModel.Id))
                     {
                         return NotFound();
                     }
@@ -165,7 +169,7 @@ namespace Booking.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(gymClass);
+            return View(viewModel);
         }
 
         // GET: GymClasses/Delete/5

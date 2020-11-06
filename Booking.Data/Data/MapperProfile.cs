@@ -12,6 +12,7 @@ namespace Booking.Data.Data
         public MapperProfile()
         {
             CreateMap<CreateGymClassViewModel, GymClass>();
+            CreateMap<EditGymClassViewModel, GymClass>().ReverseMap();
         }
     }
 }
