@@ -9,6 +9,8 @@ using Booking.Core.Entities;
 using Booking.Data.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using Booking.Core.ViewModels;
 
 namespace Booking.Web.Controllers
 {
@@ -17,11 +19,13 @@ namespace Booking.Web.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IMapper mapper;
 
-        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             db = context;
             this.userManager = userManager;
+            this.mapper = mapper;
         }
 
         // GET: GymClasses
@@ -100,15 +104,16 @@ namespace Booking.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,Name,StartDate,Duration,Description")] GymClass gymClass)
+        public async Task<IActionResult> Create(CreateGymClassViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
+                var gymClass = mapper.Map<GymClass>(viewModel);
                 db.Add(gymClass);
                 await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(gymClass);
+            return View(viewModel);
         }
 
         // GET: GymClasses/Edit/5
