@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Booking.Core.Entities;
 using Booking.Data.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Booking.Web.Controllers
 {
+    
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -86,6 +88,7 @@ namespace Booking.Web.Controllers
         }
 
         // GET: GymClasses/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -96,6 +99,7 @@ namespace Booking.Web.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,StartDate,Duration,Description")] GymClass gymClass)
         {
             if (ModelState.IsValid)
@@ -108,6 +112,7 @@ namespace Booking.Web.Controllers
         }
 
         // GET: GymClasses/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -159,6 +164,7 @@ namespace Booking.Web.Controllers
         }
 
         // GET: GymClasses/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -179,6 +185,7 @@ namespace Booking.Web.Controllers
         // POST: GymClasses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var gymClass = await db.GymClasses.FindAsync(id);

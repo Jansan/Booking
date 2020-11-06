@@ -13,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Booking.Data.Data;
 using Booking.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using AutoMapper;
 
 namespace Booking.Web
 {
@@ -45,8 +48,17 @@ namespace Booking.Web
             //{
             //    opt.Password.RequireDigit = false;
             //});
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .RequireRole("Member")
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
             services.AddRazorPages();
+
+            services.AddAutoMapper(typeof(MapperProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,7 +87,7 @@ namespace Booking.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=GymClasses}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

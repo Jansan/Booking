@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Booking.Data.Data
 {
@@ -19,6 +20,8 @@ namespace Booking.Data.Data
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUserGymClass>().HasKey(k => new { k.ApplicationUserId, k.GymClassId });
+
+            builder.Entity<GymClass>().HasQueryFilter(g => g.StartDate > DateTime.Now);
         }
     }
 }

@@ -5,10 +5,16 @@
 }
 
 <h1>Index</h1>
+ @*@if(User.Identity.IsAuthenticated) { } Alla som inloggade komma in*@
 
+@if (User.IsInRole("Admin"))
+{
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+}
+
 <table class="table">
     <thead>
         <tr>
