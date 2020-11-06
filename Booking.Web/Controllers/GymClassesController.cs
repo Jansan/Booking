@@ -14,7 +14,7 @@ using Booking.Core.ViewModels;
 
 namespace Booking.Web.Controllers
 {
-    
+
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -82,6 +82,7 @@ namespace Booking.Web.Controllers
             }
 
             var gymClass = await db.GymClasses
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (gymClass == null)
             {
@@ -120,13 +121,13 @@ namespace Booking.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-           
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var model =  mapper.Map<EditGymClassViewModel>(await db.GymClasses.FindAsync(id));
+            var model = mapper.Map<EditGymClassViewModel>(await db.GymClasses.FindAsync(id));
 
 
             if (model == null)
@@ -139,37 +140,42 @@ namespace Booking.Web.Controllers
         // POST: GymClasses/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, EditGymClassViewModel viewModel)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditNew(int? id)
         {
-            if (id != viewModel.Id)
+            if (id is null)
             {
                 return NotFound();
             }
 
+            var gymClass = await db.GymClasses.FindAsync(id);
             if (ModelState.IsValid)
             {
-             var gymClass = mapper.Map<GymClass>(viewModel);
-                try
+
+                if (await TryUpdateModelAsync(gymClass, "", g => g.Name, g => g.Duration))
                 {
-                    db.Update(gymClass);
-                    await db.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GymClassExists(viewModel.Id))
+                    try
                     {
-                        return NotFound();
+                        await db.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!GymClassExists((int)id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
-            return View(viewModel);
+            return View(mapper.Map<EditGymClassViewModel>(gymClass));
         }
 
         // GET: GymClasses/Delete/5
@@ -182,6 +188,7 @@ namespace Booking.Web.Controllers
             }
 
             var gymClass = await db.GymClasses
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (gymClass == null)
             {
