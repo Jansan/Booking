@@ -30,6 +30,7 @@ namespace Booking.Web.Controllers
         }
 
         // GET: GymClasses
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await db.GymClasses.ToListAsync());
@@ -115,21 +116,15 @@ namespace Booking.Web.Controllers
 
         // GET: GymClasses/Edit/5
         [Authorize(Roles = "Admin")]
+        [RequiredIdRequiredModelFilter("Id")]
         public async Task<IActionResult> Edit(int? id)
         {
 
-            if (id == null)
-            {
-                return NotFound();
-            }
+            
 
             var model = mapper.Map<EditGymClassViewModel>(await db.GymClasses.FindAsync(id));
 
 
-            if (model == null)
-            {
-                return NotFound();
-            }
             return View(model);
         }
 
@@ -176,20 +171,14 @@ namespace Booking.Web.Controllers
 
         // GET: GymClasses/Delete/5
         [Authorize(Roles = "Admin")]
+        [RequiredIdRequiredModelFilter("id")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            
             var gymClass = await db.GymClasses
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (gymClass == null)
-            {
-                return NotFound();
-            }
+           
 
             return View(gymClass);
         }
