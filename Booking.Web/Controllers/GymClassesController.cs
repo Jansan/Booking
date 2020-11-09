@@ -33,7 +33,40 @@ namespace Booking.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            return View(await db.GymClasses.ToListAsync());
+            var userId = userManager.GetUserId(User);
+            var model = new IndexViewModel
+            {
+                GymClasses = await db.GymClasses.Include(g => g.AttendedMembers)
+                .Select(g => new GymClassesViewModel 
+                { 
+                    Id = g.Id,
+                    Name = g.Name,
+                    Duration = g.Duration,
+                    Attending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                })
+                .ToListAsync()
+            };
+            return View(model);
+        }
+        // Get Bookings
+        public async Task<IActionResult> GetBookings()
+        {
+            var userId = userManager.GetUserId(User);
+            var model = new IndexViewModel
+            {
+                GymClasses = await db.ApplicationUserGymClasses
+                    .IgnoreQueryFilters()
+                    .Where(u => u.ApplicationUserId == userId)
+                    .Select(g => new GymClassesViewModel
+                    {
+                        Id = g.GymClass.Id,
+                        Name = g.GymClass.Name,
+                        Duration = g.GymClass.Duration,
+                        Attending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                    })
+                    .ToListAsync()
+            };
+            return View(nameof(Index), model);
         }
 
         // BookingToggle
