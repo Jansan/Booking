@@ -13,6 +13,9 @@ namespace Booking.Data.Data
         {
             CreateMap<CreateGymClassViewModel, GymClass>();
             CreateMap<EditGymClassViewModel, GymClass>().ReverseMap();
+
+            CreateMap<GymClass, GymClassesViewModel>()
+                .ForMember(dest => dest.Attending, opt => opt.Ignore());
         }
     }
 }
